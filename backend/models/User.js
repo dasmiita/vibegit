@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema({
   accentColor: { type: String, default: "" },
   followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  isPrivate: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now }
 });
 

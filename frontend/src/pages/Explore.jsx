@@ -61,7 +61,7 @@ export default function Explore() {
       ) : (
         <div className="explore-grid">
           {projects.map(p => (
-            <ProjectCard key={p._id} project={p} compact onDelete={handleDelete} />
+            <ProjectCard key={p._id} project={p} tile onDelete={handleDelete} />
           ))}
         </div>
       )}

@@ -45,6 +45,12 @@ const projectSchema = new mongoose.Schema({
   comments:     [commentSchema],
   remixedFrom:  { type: mongoose.Schema.Types.ObjectId, ref: "Project", default: null },
   remixCount:   { type: Number, default: 0 },
+  syncRequests: [{
+    remixId:       { type: mongoose.Schema.Types.ObjectId, ref: "Project", default: null },
+    requestedBy:   { type: mongoose.Schema.Types.ObjectId, ref: "User",    required: true },
+    status:        { type: String, enum: ["pending", "approved", "declined"], default: "pending" },
+    createdAt:     { type: Date, default: Date.now }
+  }],
   createdAt:    { type: Date, default: Date.now },
   updatedAt:    { type: Date, default: Date.now }
 });

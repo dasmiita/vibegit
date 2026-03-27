@@ -113,7 +113,7 @@ export default function Profile() {
       ) : (
         <div className={localLayout === "grid" ? "profile-grid" : "profile-list"}>
           {projects.map(p => (
-            <ProjectCard key={p._id} project={p} compact={localLayout === "grid"} onDelete={handleDelete} />
+            <ProjectCard key={p._id} project={p} tile={localLayout === "grid"} onDelete={handleDelete} />
           ))}
         </div>
       )}

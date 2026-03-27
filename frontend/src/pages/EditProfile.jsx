@@ -17,6 +17,7 @@ export default function EditProfile() {
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState("");
   const [currentAvatar, setCurrentAvatar] = useState("");
+  const [isPrivate, setIsPrivate] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -26,6 +27,7 @@ export default function EditProfile() {
       setBio(res.data.bio || "");
       setSkills(res.data.skills || []);
       setCurrentAvatar(res.data.avatar || "");
+      setIsPrivate(res.data.isPrivate || false);
     }).catch(() => setError("Failed to load profile data"));
   }, [id, user, navigate]);
 
@@ -52,6 +54,7 @@ export default function EditProfile() {
       const data = new FormData();
       data.append("bio", bio);
       data.append("skills", JSON.stringify(skills));
+      data.append("isPrivate", isPrivate);
       if (avatarFile) data.append("avatar", avatarFile);
 
       const res = await api.put(`/users/${id}`, data);
@@ -118,6 +121,18 @@ export default function EditProfile() {
                 </span>
               ))}
             </div>
+          </div>
+
+          <div className="edit-field privacy-toggle-row">
+            <label>Private Profile</label>
+            <button
+              type="button"
+              className={`toggle-btn ${isPrivate ? "on" : ""}`}
+              onClick={() => setIsPrivate(p => !p)}
+            >
+              <span className="toggle-knob" />
+            </button>
+            <span className="toggle-hint">{isPrivate ? "Private — your projects are hidden" : "Public — your projects are visible"}</span>
           </div>
 
           {error && <p className="edit-error">⚠ {error}</p>}

@@ -11,6 +11,8 @@ import Login from "./pages/Login";
 import ProjectDetail from "./pages/ProjectDetail";
 import ActivityFeed from "./pages/ActivityFeed";
 import EditProject from "./pages/EditProject";
+import SyncRequests from "./pages/SyncRequests";
+import Search from "./pages/Search";
 
 export default function App() {
   return (
@@ -28,6 +30,8 @@ export default function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/projects/:id" element={<ProjectDetail />} />
             <Route path="/projects/:id/edit" element={<EditProject />} />
+            <Route path="/projects/:id/sync-requests" element={<SyncRequests />} />
+            <Route path="/search" element={<Search />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>

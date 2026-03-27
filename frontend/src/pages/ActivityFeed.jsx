@@ -6,11 +6,13 @@ import "./ActivityFeed.css";
 const BASE = "http://localhost:5000/uploads/";
 
 const ACTION_TEXT = {
-  created:   (a) => <>created a new project <ProjectLink a={a} /></>,
-  liked:     (a) => <>liked <ProjectLink a={a} /></>,
-  remixed:   (a) => <>remixed <ProjectLink a={a} /> {a.meta ? `from "${a.meta}"` : ""}</>,
-  followed:  ()  => <>followed someone</>,
-  commented: (a) => <>commented on <ProjectLink a={a} /></>
+  created:        (a) => <>created a new project <ProjectLink a={a} /></>,
+  liked:          (a) => <>liked <ProjectLink a={a} /></>,
+  remixed:        (a) => <>remixed <ProjectLink a={a} /> {a.meta ? `from "${a.meta}"` : ""}</>,
+  followed:       ()  => <>followed someone</>,
+  commented:      (a) => <>commented on <ProjectLink a={a} /></>,
+  sync_requested: (a) => <>requested a sync for <ProjectLink a={a} /> {a.meta ? `from "${a.meta}"` : ""}</>,
+  sync_approved:  (a) => <>approved a sync — <ProjectLink a={a} /> was updated</>
 };
 
 function ProjectLink({ a }) {

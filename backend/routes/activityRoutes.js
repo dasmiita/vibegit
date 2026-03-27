@@ -1,16 +1,25 @@
 const express = require("express");
 const router = express.Router();
 const Activity = require("../models/Activity");
+const User = require("../models/User");
 
 // GET /activity — global feed (last 50)
 router.get("/", async (req, res) => {
   try {
+    const privateUsers = await User.find({ isPrivate: true }).select("_id");
+    const privateIds = privateUsers.map(u => u._id.toString());
+
     const activities = await Activity.find()
       .sort({ createdAt: -1 })
-      .limit(50)
+      .limit(100)
       .populate("userId", "username avatar")
       .populate("projectId", "title");
-    res.json(activities);
+
+    const filtered = activities
+      .filter(a => !privateIds.includes(a.userId?._id?.toString()))
+      .slice(0, 50);
+
+    res.json(filtered);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

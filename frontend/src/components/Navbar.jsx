@@ -23,7 +23,7 @@ export default function Navbar() {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if (search.trim()) navigate(`/?search=${encodeURIComponent(search.trim())}`);
+    if (search.trim()) navigate(`/search?q=${encodeURIComponent(search.trim())}`);
   };
 
   const handleLogout = () => {
@@ -39,7 +39,7 @@ export default function Navbar() {
 
       <form className="navbar-search" onSubmit={handleSearch}>
         <input
-          placeholder="Search projects..."
+          placeholder="Search users & projects..."
           value={search}
           onChange={e => setSearch(e.target.value)}
         />

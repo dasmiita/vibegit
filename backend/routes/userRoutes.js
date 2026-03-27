@@ -13,6 +13,34 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
 
+// GET /users/search?q=... — MUST be before /:id
+router.get("/search", async (req, res) => {
+  try {
+    const { q } = req.query;
+    if (!q) return res.json({ users: [], projects: [] });
+
+    const [users, projects] = await Promise.all([
+      User.find({ username: { $regex: q, $options: "i" }, isPrivate: { $ne: true } })
+        .select("username avatar")
+        .limit(5),
+      Project.find({
+        $or: [
+          { title: { $regex: q, $options: "i" } },
+          { description: { $regex: q, $options: "i" } }
+        ]
+      })
+        .select("title description userId")
+        .populate("userId", "username isPrivate")
+        .limit(5)
+    ]);
+
+    const publicProjects = projects.filter(p => !p.userId?.isPrivate);
+    res.json({ users, projects: publicProjects });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // GET /users/:id
 router.get("/:id", async (req, res) => {
   try {
@@ -43,11 +71,12 @@ router.put("/:id", auth, upload.single("avatar"), async (req, res) => {
     if (req.params.id !== req.user.id)
       return res.status(403).json({ message: "Not authorized" });
 
-    const { bio, skills, accentColor } = req.body;
+    const { bio, skills, accentColor, isPrivate } = req.body;
     const updates = {
       bio: bio || "",
       skills: skills ? JSON.parse(skills) : [],
-      accentColor: accentColor || ""
+      accentColor: accentColor || "",
+      isPrivate: isPrivate === "true" || isPrivate === true
     };
     if (req.file) updates.avatar = req.file.filename;
 

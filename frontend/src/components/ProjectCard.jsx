@@ -10,7 +10,7 @@ const STATUS_BADGE = {
   "idea":        { icon: "💡", label: "Idea",         cls: "status-idea" }
 };
 
-export default function ProjectCard({ project, compact = false, onDelete }) {
+export default function ProjectCard({ project, compact = false, tile = false, onDelete }) {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [likes, setLikes] = useState(project.likes?.length || 0);
@@ -49,9 +49,16 @@ export default function ProjectCard({ project, compact = false, onDelete }) {
 
   return (
     <div
-      className={`project-card ${compact ? "compact" : ""}`}
+      className={`project-card ${tile ? "tile" : ""}`}
       onClick={() => navigate(`/projects/${project._id}`)}
     >
+      {tile && (
+        <div className="tile-overlay">
+          <span>♥ {likes}</span>
+          <span>💬 {project.comments?.length || 0}</span>
+        </div>
+      )}
+
       <div className="card-header">
         <div className="card-header-left">
           {project.userId?.avatar ? (
@@ -88,7 +95,7 @@ export default function ProjectCard({ project, compact = false, onDelete }) {
         </div>
       )}
 
-      {!compact && project.codeSnippet && (
+      {!compact && !tile && project.codeSnippet && (
         <pre className="card-snippet">{project.codeSnippet}</pre>
       )}
 

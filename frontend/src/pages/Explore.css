@@ -1,7 +1,7 @@
 .explore-page {
-  max-width: 1280px;
+  max-width: 960px;
   margin: 0 auto;
-  padding: 2rem 2.5rem;
+  padding: 2rem 1.5rem;
 }
 
 .explore-header {
@@ -47,6 +47,10 @@
 
 .explore-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-  gap: 1.1rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3px;
+}
+
+@media (max-width: 768px) {
+  .explore-grid { grid-template-columns: repeat(2, 1fr); }
 }

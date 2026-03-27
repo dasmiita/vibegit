@@ -19,22 +19,21 @@
 }
 
 .navbar-logo {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--text);
   text-decoration: none;
-  letter-spacing: -0.03em;
-  white-space: nowrap;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  flex-shrink: 0;
 }
 
 .navbar-logo span {
-  background: linear-gradient(135deg, var(--accent), var(--like));
+  font-family: 'Dancing Script', cursive;
+  font-size: 1.6rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  letter-spacing: 0.01em;
 }
 
 .navbar-search {
