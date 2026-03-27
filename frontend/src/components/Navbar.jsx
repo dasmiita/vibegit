@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import "./Navbar.css";
@@ -7,7 +7,7 @@ import "./Navbar.css";
 const ACCENTS = ["#a78bfa", "#f472b6", "#34d399", "#60a5fa", "#fb923c", "#facc15"];
 const FONTS = [
   { key: "inter", label: "Sans" },
-  { key: "mono", label: "Mono" },
+  { key: "mono",  label: "Mono" },
   { key: "serif", label: "Serif" }
 ];
 
@@ -15,17 +15,27 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const { theme, toggle, accent, setAccent, font, setFont, layout, setLayout } = useTheme();
   const navigate = useNavigate();
+  const location = useLocation();
   const [search, setSearch] = useState("");
   const [showPrefs, setShowPrefs] = useState(false);
+
+  const isActive = (path) => location.pathname === path ? "active-link" : "";
 
   const handleSearch = (e) => {
     e.preventDefault();
     if (search.trim()) navigate(`/?search=${encodeURIComponent(search.trim())}`);
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
   return (
     <nav className="navbar">
-      <Link to="/" className="navbar-logo">⚡ VibeGit</Link>
+      <Link to="/" className="navbar-logo">
+        <span>VibeGit</span>
+      </Link>
 
       <form className="navbar-search" onSubmit={handleSearch}>
         <input
@@ -36,26 +46,40 @@ export default function Navbar() {
       </form>
 
       <div className="navbar-links">
-        <Link to="/">Explore</Link>
-        <Link to="/feed">Feed</Link>
-        <Link to="/activity">Activity</Link>
-        {user && <Link to="/create">+ Create</Link>}
+        <Link to="/" className={isActive("/")}>Explore</Link>
+        <Link to="/feed" className={isActive("/feed")}>Feed</Link>
+        <Link to="/activity" className={isActive("/activity")}>Activity</Link>
+
+        <div className="nav-divider" />
+
         {user ? (
           <>
-            <Link to={`/profile/${user.id}`}>@{user.username}</Link>
-            <button onClick={() => logout() || navigate("/login")} className="nav-btn">Logout</button>
+            <Link to="/create" className="nav-create-btn">+ Create</Link>
+            <Link to={`/profile/${user.id}`} className={isActive(`/profile/${user.id}`)}>
+              @{user.username}
+            </Link>
+            <button onClick={handleLogout} className="nav-btn">Sign out</button>
           </>
         ) : (
-          <Link to="/login">Login</Link>
+          <Link to="/login" className="nav-create-btn">Sign in</Link>
         )}
 
         <div className="prefs-wrapper">
-          <button className="nav-btn" onClick={() => setShowPrefs(p => !p)} title="Preferences">⚙️</button>
+          <button
+            className="nav-btn"
+            onClick={() => setShowPrefs(p => !p)}
+            title="Preferences"
+            style={{ fontSize: "1rem", padding: "0.35rem 0.5rem" }}
+          >
+            {theme === "dark" ? "🌙" : "☀️"}
+          </button>
           {showPrefs && (
             <div className="prefs-panel">
               <div className="prefs-row">
                 <span>Theme</span>
-                <button className="nav-btn" onClick={toggle}>{theme === "dark" ? "☀️ Light" : "🌙 Dark"}</button>
+                <button className="nav-btn" onClick={toggle}>
+                  {theme === "dark" ? "☀️ Light" : "🌙 Dark"}
+                </button>
               </div>
               <div className="prefs-row">
                 <span>Accent</span>
@@ -68,14 +92,24 @@ export default function Navbar() {
                       onClick={() => setAccent(c)}
                     />
                   ))}
-                  <input type="color" value={accent} onChange={e => setAccent(e.target.value)} className="color-input" title="Custom color" />
+                  <input
+                    type="color"
+                    value={accent}
+                    onChange={e => setAccent(e.target.value)}
+                    className="color-input"
+                    title="Custom color"
+                  />
                 </div>
               </div>
               <div className="prefs-row">
                 <span>Font</span>
                 <div className="font-btns">
                   {FONTS.map(f => (
-                    <button key={f.key} className={`nav-btn ${font === f.key ? "active-pref" : ""}`} onClick={() => setFont(f.key)}>
+                    <button
+                      key={f.key}
+                      className={`nav-btn ${font === f.key ? "active-pref" : ""}`}
+                      onClick={() => setFont(f.key)}
+                    >
                       {f.label}
                     </button>
                   ))}

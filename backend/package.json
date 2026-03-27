@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node --openssl-legacy-provider server.js",
+    "dev": "node --openssl-legacy-provider server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -16,7 +18,7 @@
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.3.3",
+    "mongoose": "^7.8.7",
     "multer": "^2.1.1"
   }
 }

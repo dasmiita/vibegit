@@ -74,6 +74,7 @@ export default function ProjectDetail() {
   const [liked, setLiked] = useState(false);
   const [likes, setLikes] = useState(0);
   const [remixing, setRemixing] = useState(false);
+  const [activeVersion, setActiveVersion] = useState(null); // null = latest
 
   useEffect(() => {
     api.get(`/projects/${id}`).then(res => {
@@ -144,6 +145,9 @@ export default function ProjectDetail() {
           <div className="detail-actions">
             <span className={`status-badge ${badge.cls}`}>{badge.icon} {badge.label}</span>
             <button className={`like-btn-lg ${liked ? "liked" : ""}`} onClick={handleLike}>♥ {likes}</button>
+            {isOwner && (
+              <button className="edit-project-btn" onClick={() => navigate(`/projects/${id}/edit`)}>✏️ Edit</button>
+            )}
             {!isOwner && (
               <button className="remix-btn" onClick={handleRemix} disabled={remixing}>
                 {remixing ? "Remixing..." : "🔀 Remix"}
@@ -152,6 +156,7 @@ export default function ProjectDetail() {
           </div>
         </div>
 
+        <div className="detail-body">
         <h1 className="detail-title">{project.title}</h1>
 
         {project.remixedFrom && (
@@ -248,6 +253,64 @@ export default function ProjectDetail() {
             ))}
           </div>
         </div>
+
+        {/* Version History */}
+        {project.versions?.length > 0 && (
+          <div className="detail-section">
+            <h3>🕓 Version History ({project.versions.length + 1} versions)</h3>
+            <div className="version-list">
+              {/* Current version */}
+              <div className={`version-item current ${activeVersion === null ? "active" : ""}`}
+                onClick={() => setActiveVersion(null)}>
+                <div className="version-meta">
+                  <span className="version-badge">v{project.currentVersion} · Latest</span>
+                  <span className="version-date">
+                    {new Date(project.updatedAt || project.createdAt).toLocaleString()}
+                  </span>
+                </div>
+                <p className="version-title">{project.title}</p>
+              </div>
+
+              {/* Previous versions — newest first */}
+              {[...project.versions].reverse().map((v) => (
+                <div
+                  key={v.versionNumber}
+                  className={`version-item ${activeVersion?.versionNumber === v.versionNumber ? "active" : ""}`}
+                  onClick={() => setActiveVersion(prev =>
+                    prev?.versionNumber === v.versionNumber ? null : v
+                  )}
+                >
+                  <div className="version-meta">
+                    <span className="version-badge">v{v.versionNumber}</span>
+                    <span className="version-date">{new Date(v.editedAt).toLocaleString()}</span>
+                  </div>
+                  <p className="version-title">{v.title}</p>
+
+                  {activeVersion?.versionNumber === v.versionNumber && (
+                    <div className="version-preview">
+                      <p className="version-desc">{v.description}</p>
+                      {v.codeSnippet && <pre className="version-snippet">{v.codeSnippet}</pre>}
+                      {(v.about?.features || v.about?.howItWorks || v.about?.futurePlans) && (
+                        <div className="version-about">
+                          {v.about.features    && <p><strong>✨ Features:</strong> {v.about.features}</p>}
+                          {v.about.howItWorks  && <p><strong>⚙️ How it works:</strong> {v.about.howItWorks}</p>}
+                          {v.about.futurePlans && <p><strong>🚀 Future plans:</strong> {v.about.futurePlans}</p>}
+                        </div>
+                      )}
+                      {v.tags?.length > 0 && (
+                        <div className="version-tags">
+                          {v.tags.map(t => <span key={t} className="tag">#{t}</span>)}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        </div>{/* end detail-body */}
 
       </div>
     </div>

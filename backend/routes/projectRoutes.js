@@ -111,6 +111,64 @@ router.post("/:id/remix", auth, async (req, res) => {
   }
 });
 
+// PUT /projects/:id — edit, preserving version history
+router.put("/:id", auth, upload.array("files", 10), async (req, res) => {
+  try {
+    const project = await Project.findById(req.params.id);
+    if (!project) return res.status(404).json({ message: "Not found" });
+
+    // Support both populated object and raw ObjectId
+    const ownerId = project.userId?._id?.toString() || project.userId?.toString();
+    if (ownerId !== req.user.id)
+      return res.status(403).json({ message: "Not authorized" });
+
+    // Guard against old documents missing these fields
+    if (!Array.isArray(project.versions)) project.versions = [];
+    if (!project.currentVersion) project.currentVersion = 1;
+
+    // Snapshot current state before overwriting
+    project.versions.push({
+      versionNumber: project.currentVersion,
+      title:         project.title,
+      description:   project.description,
+      codeSnippet:   project.codeSnippet || "",
+      about:         {
+        features:    project.about?.features    || "",
+        howItWorks:  project.about?.howItWorks  || "",
+        futurePlans: project.about?.futurePlans || ""
+      },
+      status:        project.status  || "idea",
+      tags:          project.tags    || [],
+      domain:        project.domain  || "",
+      editedAt:      project.updatedAt || project.createdAt
+    });
+
+    const { title, description, codeSnippet, tags, status, domain, features, howItWorks, futurePlans } = req.body;
+    const newFiles = (req.files || []).map(f => ({ name: f.originalname, path: f.filename, size: f.size }));
+
+    if (title)       project.title       = title;
+    if (description) project.description = description;
+    if (codeSnippet !== undefined) project.codeSnippet = codeSnippet;
+    if (status)      project.status      = status;
+    if (domain !== undefined) project.domain = domain;
+    if (tags)        project.tags        = JSON.parse(tags);
+    project.about = {
+      features:    features    !== undefined ? features    : (project.about?.features    || ""),
+      howItWorks:  howItWorks  !== undefined ? howItWorks  : (project.about?.howItWorks  || ""),
+      futurePlans: futurePlans !== undefined ? futurePlans : (project.about?.futurePlans || "")
+    };
+    if (newFiles.length > 0) project.files = [...(project.files || []), ...newFiles];
+    project.currentVersion += 1;
+    project.updatedAt = new Date();
+
+    await project.save();
+    const populated = await project.populate("userId", "username avatar");
+    res.json(populated);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // DELETE /projects/:id
 router.delete("/:id", auth, async (req, res) => {
   try {

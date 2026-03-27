@@ -1,10 +1,10 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const path = require("path");
 
 const app = express();
 
-// ✅ Middleware FIRST — CORS must be before everything
 app.use(cors({
   origin: "http://localhost:3000",
   credentials: true,
@@ -13,27 +13,23 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use("/uploads", require("express").static(require("path").join(__dirname, "uploads")));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// ✅ Routes AFTER middleware
-const projectRoutes = require("./routes/projectRoutes");
-const authRoutes = require("./routes/authRoutes");
-const userRoutes = require("./routes/userRoutes");
-const activityRoutes = require("./routes/activityRoutes");
-app.use("/projects", projectRoutes);
-app.use("/auth", authRoutes);
-app.use("/users", userRoutes);
-app.use("/activity", activityRoutes);
+app.use("/projects", require("./routes/projectRoutes"));
+app.use("/auth",     require("./routes/authRoutes"));
+app.use("/users",    require("./routes/userRoutes"));
+app.use("/activity", require("./routes/activityRoutes"));
 
-// 🔌 MongoDB Connection
-//mongoose.connect("mongodb+srv://dasmiita:LD34ehb4zL.FjbL@vibegit.ksnhxcx.mongodb.net/mongodb.net/vibegit") 
-mongoose.connect("mongodb+srv://dasmiita:innu2013@vibegit.ksnhxcx.mongodb.net/vibegit")
-  .then(() => console.log("MongoDB connected ✅"))
-  .catch(err => console.log(err));
+app.get("/", (req, res) => res.send("API Running 🚀"));
 
-// Test route
-app.get("/", (req, res) => {
-  res.send("API Running 🚀");
+mongoose.connect("mongodb+srv://dasmiita:innu2013@vibegit.ksnhxcx.mongodb.net/vibegit", {
+  family: 4
+})
+.then(() => {
+  console.log("MongoDB connected ✅");
+  app.listen(5000, () => console.log("Server running on port 5000 🚀"));
+})
+.catch(err => {
+  console.error("MongoDB FAILED ❌:", err.message);
+  process.exit(1);
 });
-
-app.listen(5000, () => console.log("Server running on port 5000"));

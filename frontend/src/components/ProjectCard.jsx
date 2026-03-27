@@ -65,6 +65,7 @@ export default function ProjectCard({ project, compact = false, onDelete }) {
         </div>
         <div className="card-header-right">
           <span className={`status-badge ${badge.cls}`}>{badge.icon} {badge.label}</span>
+          {isOwner && <button className="edit-btn" onClick={e => { e.stopPropagation(); navigate(`/projects/${project._id}/edit`); }}>✏️</button>}
           {isOwner && <button className="delete-btn" onClick={handleDelete}>✕</button>}
         </div>
       </div>

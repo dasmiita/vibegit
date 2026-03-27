@@ -10,6 +10,7 @@ import EditProfile from "./pages/EditProfile";
 import Login from "./pages/Login";
 import ProjectDetail from "./pages/ProjectDetail";
 import ActivityFeed from "./pages/ActivityFeed";
+import EditProject from "./pages/EditProject";
 
 export default function App() {
   return (
@@ -26,6 +27,7 @@ export default function App() {
             <Route path="/profile/:id/edit" element={<EditProfile />} />
             <Route path="/login" element={<Login />} />
             <Route path="/projects/:id" element={<ProjectDetail />} />
+            <Route path="/projects/:id/edit" element={<EditProject />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>
