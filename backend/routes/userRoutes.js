@@ -5,6 +5,8 @@ const User = require("../models/User");
 const Project = require("../models/Project");
 const auth = require("../middleware/auth");
 
+const Activity = require("../models/Activity");
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, "uploads/"),
   filename: (req, file, cb) => cb(null, `avatar-${Date.now()}-${file.originalname}`)
@@ -77,6 +79,9 @@ router.post("/:id/follow", auth, async (req, res) => {
 
     await me.save();
     await target.save();
+    if (!isFollowing) {
+      await Activity.create({ userId: req.user.id, type: "followed", targetId: req.params.id });
+    }
     res.json({ following: !isFollowing, followerCount: target.followers.length });
   } catch (err) {
     res.status(500).json({ message: err.message });

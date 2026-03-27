@@ -80,6 +80,89 @@
 
 .like-btn-lg:hover, .like-btn-lg.liked { border-color: var(--like); color: var(--like); }
 
+.remix-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.remix-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.remix-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.detail-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.detail-remix-label {
+  font-size: 0.82rem;
+  color: var(--text-faint);
+  font-style: italic;
+}
+
+.remix-source-link { color: var(--accent); text-decoration: none; }
+.remix-source-link:hover { text-decoration: underline; }
+
+/* Status badge */
+.status-badge {
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.status-completed   { background: #d1fae5; color: #065f46; }
+.status-in-progress { background: #fef3c7; color: #92400e; }
+.status-idea        { background: #e0e7ff; color: #3730a3; }
+
+[data-theme="dark"] .status-completed   { background: #064e3b; color: #6ee7b7; }
+[data-theme="dark"] .status-in-progress { background: #451a03; color: #fcd34d; }
+[data-theme="dark"] .status-idea        { background: #1e1b4b; color: #a5b4fc; }
+
+/* Clickable tags */
+.clickable-tag { cursor: pointer; transition: opacity 0.15s; }
+.clickable-tag:hover { opacity: 0.75; }
+
+/* About block */
+.about-block {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.2rem;
+}
+
+.about-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.about-item:last-child { border-bottom: none; padding-bottom: 0; }
+
+.about-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.about-item p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
 .detail-title {
   font-size: 1.7rem;
   font-weight: 700;

@@ -8,7 +8,7 @@ const AVATAR_BASE = "http://localhost:5000/uploads/";
 
 export default function EditProfile() {
   const { id } = useParams();
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const navigate = useNavigate();
 
   const [bio, setBio] = useState("");
@@ -26,7 +26,7 @@ export default function EditProfile() {
       setBio(res.data.bio || "");
       setSkills(res.data.skills || []);
       setCurrentAvatar(res.data.avatar || "");
-    });
+    }).catch(() => setError("Failed to load profile data"));
   }, [id, user, navigate]);
 
   const handleAvatarChange = (e) => {
@@ -53,10 +53,14 @@ export default function EditProfile() {
       data.append("bio", bio);
       data.append("skills", JSON.stringify(skills));
       if (avatarFile) data.append("avatar", avatarFile);
-      await api.put(`/users/${id}`, data, { headers: { "Content-Type": "multipart/form-data" } });
+
+      const res = await api.put(`/users/${id}`, data);
+      // Update auth context so navbar/profile reflect changes immediately
+      updateUser({ bio: res.data.bio, skills: res.data.skills, avatar: res.data.avatar });
       navigate(`/profile/${id}`);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to save");
+      const msg = err.response?.data?.message || err.message || "Failed to save";
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -116,7 +120,7 @@ export default function EditProfile() {
             </div>
           </div>
 
-          {error && <p className="edit-error">{error}</p>}
+          {error && <p className="edit-error">⚠ {error}</p>}
 
           <div className="edit-actions">
             <button type="button" className="cancel-btn" onClick={() => navigate(`/profile/${id}`)}>Cancel</button>

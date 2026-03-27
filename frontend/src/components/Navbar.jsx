@@ -38,6 +38,7 @@ export default function Navbar() {
       <div className="navbar-links">
         <Link to="/">Explore</Link>
         <Link to="/feed">Feed</Link>
+        <Link to="/activity">Activity</Link>
         {user && <Link to="/create">+ Create</Link>}
         {user ? (
           <>

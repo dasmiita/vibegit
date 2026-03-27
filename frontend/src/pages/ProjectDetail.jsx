@@ -1,13 +1,18 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import { useAuth } from "../context/AuthContext";
 import "./ProjectDetail.css";
 
 const BASE = "http://localhost:5000/uploads/";
-
 const IMAGE_EXTS = ["jpg", "jpeg", "png", "gif", "webp", "svg"];
 const CODE_EXTS  = ["js", "jsx", "ts", "tsx", "py", "html", "css", "json", "md", "txt", "sh", "java", "c", "cpp", "go", "rs"];
+
+const STATUS_BADGE = {
+  "completed":   { icon: "✅", label: "Completed",   cls: "status-completed" },
+  "in-progress": { icon: "🚧", label: "In Progress", cls: "status-in-progress" },
+  "idea":        { icon: "💡", label: "Idea",         cls: "status-idea" }
+};
 
 function getExt(name) { return name.split(".").pop().toLowerCase(); }
 function isImage(name) { return IMAGE_EXTS.includes(getExt(name)); }
@@ -29,7 +34,7 @@ function FileViewer({ file }) {
     } catch { setCodeContent("Could not load file."); setExpanded(true); }
   };
 
-  const formatSize = (b) => b < 1024 ? `${b} B` : b < 1048576 ? `${(b/1024).toFixed(1)} KB` : `${(b/1048576).toFixed(1)} MB`;
+  const fmt = (b) => b < 1024 ? `${b} B` : b < 1048576 ? `${(b/1024).toFixed(1)} KB` : `${(b/1048576).toFixed(1)} MB`;
 
   return (
     <div className="file-viewer-item">
@@ -37,7 +42,7 @@ function FileViewer({ file }) {
         <span className="file-icon">{isImage(file.name) ? "🖼️" : isCode(file.name) ? "📝" : "📄"}</span>
         <span className="file-name">{file.name}</span>
         <span className="file-ext">.{ext}</span>
-        <span className="file-size">{formatSize(file.size)}</span>
+        <span className="file-size">{fmt(file.size)}</span>
         <div className="file-actions">
           {(isCode(file.name) || isImage(file.name)) && (
             <button className="file-action-btn" onClick={loadCode}>
@@ -47,14 +52,12 @@ function FileViewer({ file }) {
           <a href={url} download={file.name} className="file-action-btn">⬇ Download</a>
         </div>
       </div>
-
       {expanded && (
         <div className="file-preview-area">
-          {isImage(file.name) ? (
-            <img src={url} alt={file.name} className="file-img-preview" />
-          ) : (
-            <pre className="file-code-preview">{codeContent}</pre>
-          )}
+          {isImage(file.name)
+            ? <img src={url} alt={file.name} className="file-img-preview" />
+            : <pre className="file-code-preview">{codeContent}</pre>
+          }
         </div>
       )}
     </div>
@@ -64,11 +67,13 @@ function FileViewer({ file }) {
 export default function ProjectDetail() {
   const { id } = useParams();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [comment, setComment] = useState("");
   const [liked, setLiked] = useState(false);
   const [likes, setLikes] = useState(0);
+  const [remixing, setRemixing] = useState(false);
 
   useEffect(() => {
     api.get(`/projects/${id}`).then(res => {
@@ -79,10 +84,23 @@ export default function ProjectDetail() {
   }, [id, user]);
 
   const handleLike = async () => {
-    if (!user) return;
+    if (!user) return navigate("/login");
     const res = await api.post(`/projects/${id}/like`);
     setLikes(res.data.likes);
     setLiked(res.data.liked);
+  };
+
+  const handleRemix = async () => {
+    if (!user) return navigate("/login");
+    setRemixing(true);
+    try {
+      const res = await api.post(`/projects/${id}/remix`);
+      navigate(`/projects/${res.data._id}`);
+    } catch (err) {
+      alert(err.response?.data?.message || "Could not remix");
+    } finally {
+      setRemixing(false);
+    }
   };
 
   const handleComment = async (e) => {
@@ -104,11 +122,14 @@ export default function ProjectDetail() {
   const username = project.userId?.username || "unknown";
   const userId = project.userId?._id || project.userId;
   const avatarUrl = project.userId?.avatar ? `${BASE}${project.userId.avatar}` : null;
+  const badge = STATUS_BADGE[project.status] || STATUS_BADGE["idea"];
+  const isOwner = user && user.id === userId?.toString();
 
   return (
     <div className="detail-page">
       <div className="detail-main">
 
+        {/* Header */}
         <div className="detail-header">
           <div className="detail-author">
             {avatarUrl
@@ -120,19 +141,71 @@ export default function ProjectDetail() {
               <p className="detail-date">{new Date(project.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</p>
             </div>
           </div>
-          <button className={`like-btn-lg ${liked ? "liked" : ""}`} onClick={handleLike}>♥ {likes}</button>
+          <div className="detail-actions">
+            <span className={`status-badge ${badge.cls}`}>{badge.icon} {badge.label}</span>
+            <button className={`like-btn-lg ${liked ? "liked" : ""}`} onClick={handleLike}>♥ {likes}</button>
+            {!isOwner && (
+              <button className="remix-btn" onClick={handleRemix} disabled={remixing}>
+                {remixing ? "Remixing..." : "🔀 Remix"}
+              </button>
+            )}
+          </div>
         </div>
 
         <h1 className="detail-title">{project.title}</h1>
 
+        {project.remixedFrom && (
+          <p className="detail-remix-label">
+            🔀 Remixed from{" "}
+            <Link to={`/projects/${project.remixedFrom._id}`} className="remix-source-link">
+              {project.remixedFrom.title || "a project"}
+            </Link>
+          </p>
+        )}
+
+        {/* Tags */}
         {project.tags?.length > 0 && (
           <div className="detail-tags">
-            {project.tags.map(tag => <span key={tag} className="tag">#{tag}</span>)}
+            {project.tags.map(tag => (
+              <span
+                key={tag}
+                className="tag clickable-tag"
+                onClick={() => navigate(`/?tag=${encodeURIComponent(tag)}`)}
+              >
+                #{tag}
+              </span>
+            ))}
           </div>
         )}
 
         <p className="detail-desc">{project.description}</p>
 
+        {/* About section */}
+        {(project.about?.features || project.about?.howItWorks || project.about?.futurePlans) && (
+          <div className="detail-section about-block">
+            <h3>📋 About This Project</h3>
+            {project.about.features && (
+              <div className="about-item">
+                <span className="about-label">✨ Features</span>
+                <p>{project.about.features}</p>
+              </div>
+            )}
+            {project.about.howItWorks && (
+              <div className="about-item">
+                <span className="about-label">⚙️ How it works</span>
+                <p>{project.about.howItWorks}</p>
+              </div>
+            )}
+            {project.about.futurePlans && (
+              <div className="about-item">
+                <span className="about-label">🚀 Future plans</span>
+                <p>{project.about.futurePlans}</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Code snippet */}
         {project.codeSnippet && (
           <div className="detail-section">
             <h3>Code Snippet</h3>
@@ -140,6 +213,7 @@ export default function ProjectDetail() {
           </div>
         )}
 
+        {/* Files */}
         {project.files?.length > 0 && (
           <div className="detail-section">
             <h3>📁 Files ({project.files.length})</h3>
@@ -149,6 +223,7 @@ export default function ProjectDetail() {
           </div>
         )}
 
+        {/* Comments */}
         <div className="detail-section">
           <h3>💬 Comments ({project.comments?.length || 0})</h3>
           {user && (

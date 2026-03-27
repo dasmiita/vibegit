@@ -89,6 +89,30 @@
 .domain-btn:hover { border-color: var(--accent); color: var(--accent); }
 .domain-btn.selected { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
 
+/* Status picker */
+.status-picker {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.status-btn {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.45rem 1rem;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--text-muted);
+}
+
+.status-btn:hover { border-color: var(--accent); color: var(--text); }
+.status-btn.selected { border-color: var(--accent); color: var(--text); font-weight: 600; background: var(--tag-bg); }
+
+/* About section */
+.about-section { gap: 0.6rem !important; }
+
 .auto-tags {
   display: flex;
   flex-wrap: wrap;
