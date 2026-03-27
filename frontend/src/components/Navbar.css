@@ -26,7 +26,7 @@
 }
 
 .navbar-logo span {
-  font-family: 'Dancing Script', cursive;
+  font-family: 'Pacifico', cursive;
   font-size: 1.6rem;
   font-weight: 700;
   background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
@@ -34,6 +34,7 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
   letter-spacing: 0.01em;
+  padding: 0.3rem 0.4rem;
 }
 
 .navbar-search {
