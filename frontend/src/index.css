@@ -30,16 +30,17 @@
   --shadow-sm:    0 1px 3px rgba(0,0,0,0.4);
   --shadow-md:    0 4px 16px rgba(0,0,0,0.5);
   --shadow-lg:    0 8px 32px rgba(0,0,0,0.6);
-  --gradient-bg:  linear-gradient(135deg, #0e0e10 0%, #12101a 50%, #0e0e10 100%);
   --font:         'Inter', sans-serif;
   --radius-sm:    8px;
   --radius-md:    12px;
   --radius-lg:    16px;
   --radius-xl:    20px;
+  --grid-color:   rgba(255,255,255,0.04);
+  --scanline-color: rgba(255,255,255,0.025);
 }
 
 [data-theme="light"] {
-  --bg:           #fafafa;
+  --bg:           #ffffff;
   --bg-card:      #ffffff;
   --bg-elevated:  #f4f4f5;
   --bg-input:     #f9f9fb;
@@ -62,12 +63,13 @@
   --shadow-sm:    0 1px 3px rgba(0,0,0,0.06);
   --shadow-md:    0 4px 16px rgba(0,0,0,0.08);
   --shadow-lg:    0 8px 32px rgba(0,0,0,0.1);
-  --gradient-bg:  linear-gradient(135deg, #fafafa 0%, #f5f3ff 50%, #fafafa 100%);
   --font:         'Inter', sans-serif;
   --radius-sm:    8px;
   --radius-md:    12px;
   --radius-lg:    16px;
   --radius-xl:    20px;
+  --grid-color:   rgba(0,0,0,0.055);
+  --scanline-color: rgba(0,0,0,0.018);
 }
 
 html { scroll-behavior: smooth; }
@@ -75,26 +77,54 @@ html { scroll-behavior: smooth; }
 body {
   font-family: var(--font);
   background: var(--bg);
-  background-image: var(--gradient-bg);
-  background-attachment: fixed;
   color: var(--text);
   min-height: 100vh;
   transition: background 0.25s, color 0.25s;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  position: relative;
+}
+
+/* Global scanline grid — covers every page including navbar */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--grid-color) 1px, transparent 1px);
+  background-size: 100% 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Scanline horizontal lines */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    var(--scanline-color) 2px,
+    var(--scanline-color) 4px
+  );
+  pointer-events: none;
+  z-index: 0;
 }
 
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 10px; }
 
-/* Shared utilities */
 .page-title {
   font-size: 1.35rem;
   font-weight: 700;
   color: var(--text);
   letter-spacing: -0.02em;
   margin-bottom: 1.5rem;
+  position: relative;
+  z-index: 1;
 }
 
 .loading {
@@ -103,6 +133,8 @@ body {
   margin-top: 5rem;
   font-size: 0.95rem;
   letter-spacing: 0.01em;
+  position: relative;
+  z-index: 1;
 }
 
 .empty {
@@ -110,9 +142,10 @@ body {
   text-align: center;
   margin-top: 5rem;
   font-size: 0.95rem;
+  position: relative;
+  z-index: 1;
 }
 
-/* Tag shared style */
 .tag {
   display: inline-flex;
   align-items: center;

@@ -2,9 +2,10 @@
   max-width: 960px;
   margin: 0 auto;
   padding: 2.5rem 2rem 3rem;
+  position: relative;
+  z-index: 1;
 }
 
-/* Instagram-style header */
 .profile-header {
   display: flex;
   gap: 4rem;
@@ -103,17 +104,9 @@
 
 .follow-btn.following:hover { border-color: #f87171; color: #f87171; }
 
-/* Stats row — Instagram style: horizontal, spaced */
-.profile-stats {
-  display: flex;
-  gap: 2.5rem;
-}
+.profile-stats { display: flex; gap: 2.5rem; }
 
-.stat {
-  display: flex;
-  align-items: baseline;
-  gap: 0.35rem;
-}
+.stat { display: flex; align-items: baseline; gap: 0.35rem; }
 
 .stat strong {
   font-size: 1rem;
@@ -133,11 +126,7 @@
   max-width: 440px;
 }
 
-.profile-skills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-}
+.profile-skills { display: flex; flex-wrap: wrap; gap: 0.35rem; }
 
 .skill-tag {
   background: var(--bg-elevated);
@@ -149,12 +138,7 @@
   border: 1px solid var(--border-soft);
 }
 
-/* Vibe Score */
-.vibe-score {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
+.vibe-score { display: flex; align-items: center; gap: 0.75rem; }
 
 .vibe-label {
   font-size: 0.82rem;
@@ -185,7 +169,6 @@
   min-width: 24px;
 }
 
-/* Projects section */
 .profile-projects-header {
   display: flex;
   align-items: center;
@@ -208,11 +191,7 @@
   cursor: pointer;
 }
 
-.layout-toggle {
-  display: flex;
-  gap: 0.25rem;
-  margin-left: auto;
-}
+.layout-toggle { display: flex; gap: 0.25rem; margin-left: auto; }
 
 .layout-toggle button {
   background: none;
@@ -233,7 +212,6 @@
   gap: 3px;
 }
 
-/* Instagram-style tight grid for profile */
 .profile-grid .project-card {
   border-radius: 0;
   border: none;
@@ -247,11 +225,7 @@
   background: var(--bg-elevated);
 }
 
-.profile-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-}
+.profile-list { display: flex; flex-direction: column; gap: 0.8rem; }
 
 @media (max-width: 768px) {
   .profile-header { flex-direction: column; gap: 1.5rem; }

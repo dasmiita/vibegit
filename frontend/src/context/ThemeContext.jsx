@@ -25,6 +25,7 @@ export function ThemeProvider({ children }) {
     document.documentElement.style.setProperty("--accent-hover", accent + "cc");
     document.documentElement.style.setProperty("--border-hover", accent);
     document.documentElement.style.setProperty("--tag-text", accent);
+    document.documentElement.style.setProperty("--lp-accent", accent);
     localStorage.setItem("accent", accent);
   }, [accent]);
 
